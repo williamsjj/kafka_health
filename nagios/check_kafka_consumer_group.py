@@ -103,8 +103,8 @@ if __name__ == "__main__":
     elif json_output["status"]["status"] == "STALL":
         status_result.updateStatus(NAGIOS_CRITICAL,
                                    "A partition has stalled.")
-    else:
-        status_result.updateStatus(NAGIOS_WARN,
+    elif json_output["status"]["status"] != "OK":
+        status_result.updateStatus(NAGIOS_WARNING,
                                   "Unexpected status value: %s" % json_output["status"]["status"])
     
     # Parse maxlag info
@@ -135,8 +135,9 @@ if __name__ == "__main__":
                                                                         len(problem_topic_partitions[topic]["WARN"]),
                                                                         len(problem_topic_partitions[topic]["STOP"]),
                                                                         len(problem_topic_partitions[topic]["STALL"]))
-                                                                                               
-    status_result.updateStatus(NAGIOS_UNKNOWN, "|"+problem_partition_detail)
+    
+    if problem_partition_detail: 
+        status_result.updateStatus(NAGIOS_UNKNOWN, "|"+problem_partition_detail)
 
     # Return status
     print "%s: %s" % (STATUS_MSG_PREFIX[status_result.status], status_result.status_msg)
